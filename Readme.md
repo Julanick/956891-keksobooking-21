@@ -1,7 +1,7 @@
 # Личный проект «Кексобукинг» [![Build status][travis-image]][travis-url]
 
 * Студент: [Юлия Покидько](https://up.htmlacademy.ru/javascript/21/user/956891).
-* Наставник: `Неизвестно`.
+* Наставник: `Герман Топалов`.
 
 ---
 
