@@ -1,7 +1,10 @@
-/* eslint-disable no-unused-vars */
 "use strict";
 
 const ADS_NUM = 8;
+
+const pinTemplate = document.querySelector(`#pin`).content;
+
+const mapPins = document.querySelector(`.map__pins`);
 
 const titles = [`title01`, `title02`, `title03`];
 
@@ -45,7 +48,7 @@ const getRandomFromArray = function (arr) {
   return arr[rand];
 };
 
-const shuffle = function (array) {
+const shuffleArray = function (array) {
   for (let i = array.length - 1; i > 0; i--) {
     let j = Math.floor(Math.random() * (i + 1));
     [array[i], array[j]] = [array[j], array[i]];
@@ -54,17 +57,17 @@ const shuffle = function (array) {
 };
 
 const getRandomArrayElements = function (arr) {
-  const shuffledArray = shuffle(arr);
+  const shuffledArray = shuffleArray(arr);
   const rand = getRandomInteger(1, shuffledArray.length - 1);
   return shuffledArray.slice(0, rand);
 };
 
 const createAdsData = (length) => {
   const array = [];
-  for (let index = 1; index <= length; index++) {
+  for (let i = 1; i <= length; i++) {
     const object = {
       author: {
-        avatar: `img/avatars/user0` + index + `.png`,
+        avatar: `img/avatars/user0` + i + `.png`,
       },
       offer: {
         title: getRandomFromArray(titles),
@@ -89,25 +92,27 @@ const createAdsData = (length) => {
   return array;
 };
 
-const template = document.querySelector(`#pin`).content;
+const renderPins = function (data) {
+  const fragment = document.createDocumentFragment();
 
-const fragment = document.createDocumentFragment();
+  for (let i = 0; i < data.length; i++) {
 
-const data = createAdsData(ADS_NUM);
+    const element = pinTemplate.cloneNode(true);
+    const elementData = data[i];
 
-data.forEach((elementData) => {
-  let element = template.cloneNode(true);
+    const button = element.querySelector(`.map__pin`);
+    button.setAttribute(`style`, `left: ` + elementData.location.x + `px; top: ` + elementData.location.y + `px`);
 
-  let button = element.querySelector(`.map__pin`);
-  button.setAttribute(`style`, `left: ` + elementData.location.x + `px; top: ` + elementData.location.y + `px`);
+    const img = element.querySelector(`img`);
+    img.src = elementData.author.avatar;
+    img.alt = elementData.offer.title;
 
-  let img = element.querySelector(`img`);
-  img.src = elementData.author.avatar;
-  img.alt = elementData.offer.title;
+    fragment.appendChild(element);
+  }
 
-  fragment.appendChild(element);
-});
+  mapPins.appendChild(fragment);
+};
 
-const mapPins = document.querySelector(`.map__pins`);
+const adsData = createAdsData(ADS_NUM);
 
-mapPins.appendChild(fragment);
+renderPins(adsData);
