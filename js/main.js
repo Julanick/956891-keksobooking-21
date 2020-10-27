@@ -30,8 +30,9 @@ const validateCapacity = function () {
   const roomsValue = Number.parseInt(roomsSelect.value, 10);
 
   if (roomsValue === 1 && guestsValue >= 3) {
-    guestsSelect.setCustomValidity(`Слижком много гостей для этого количества комнат`);
-    guestsSelect.reportValidity();
+    guestsSelect.setCustomValidity(`Слишком много гостей для этого количества комнат`);
+  } else {
+    guestsSelect.setCustomValidity(``);
   }
 
 };
