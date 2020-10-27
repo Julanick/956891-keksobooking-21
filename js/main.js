@@ -10,6 +10,41 @@ const mapPinsContainer = map.querySelector(`.map__pins`);
 
 const mapFiltersContainer = map.querySelector(`.map__filters-container`);
 
+const mapFiltersForm = mapFiltersContainer.querySelector(`.map__filters`);
+
+const adFormNotice = document.querySelector(`.ad-form`);
+
+const address = document.querySelector(`#address`);
+
+const mainPinMap = document.querySelector(`.map__pin--main`);
+
+const form = document.querySelector(`.ad-form`);
+
+const guestsSelect = form.querySelector(`#capacity`);
+
+const roomsSelect = form.querySelector(`#room_number`);
+
+
+const validateCapacity = function () {
+  const guestsValue = Number.parseInt(guestsSelect.value, 10);
+  const roomsValue = Number.parseInt(roomsSelect.value, 10);
+
+  if (roomsValue === 1 && guestsValue >= 3) {
+    guestsSelect.setCustomValidity(`Слижком много гостей для этого количества комнат`);
+    guestsSelect.reportValidity();
+  }
+
+};
+
+form.addEventListener(`change`, function (evt) {
+  switch (evt.target) {
+    case guestsSelect:
+    case roomsSelect:
+      validateCapacity();
+      break;
+  }
+});
+
 const cardTemplate = document.querySelector(`#card`).content;
 
 const titles = [`title01`, `title02`, `title03`];
@@ -159,11 +194,11 @@ const renderCard = function (data) {
     hideElement(title);
   }
 
-  const address = element.querySelector(`.popup__text--address`);
+  const addressPopup = element.querySelector(`.popup__text--address`);
   if (offer.address) {
-    address.innerText = offer.address;
+    addressPopup.innerText = offer.address;
   } else {
-    hideElement(address);
+    hideElement(addressPopup);
   }
 
   const price = element.querySelector(`.popup__text--price`);
@@ -259,7 +294,81 @@ const renderCard = function (data) {
   map.insertBefore(element, mapFiltersContainer);
 };
 
-const adsData = createAdsData(ADS_NUM);
+const disableElements = function () {
+  const fieldsets = document.querySelectorAll(`fieldset`);
+  for (let i = 0; i < fieldsets.length; i++) {
+    const element = fieldsets[i];
+    element.setAttribute(`disabled`, `true`);
+  }
+  document.querySelector(`.map__filters`).classList.add(`map__filters--disabled`);
+  document.querySelector(`.ad-form`).classList.add(`ad-form--disabled`);
+};
 
+const enableFieldsets = function () {
+  const fieldsets = document.querySelectorAll(`fieldset`);
+  for (let i = 0; i < fieldsets.length; i++) {
+    const element = fieldsets[i];
+    element.removeAttribute(`disabled`);
+  }
+};
+
+const activatePage = function () {
+  enableFieldsets();
+  map.classList.remove(`map--faded`);
+  mapFiltersForm.classList.remove(`map__filters--disabled`);
+  adFormNotice.classList.remove(`ad-form--disabled`);
+};
+
+const setAddress = function (x, y) {
+  address.value = `${x}, ${y}`;
+};
+
+
+mainPinMap.addEventListener(`keydown`, function (evt) {
+  evt.preventDefault();
+  if (evt.keyCode === 13) {
+    activatePage();
+  }
+});
+
+const adsData = createAdsData(ADS_NUM);
 renderPins(adsData);
+
+const mapPins = document.querySelectorAll(`.map__pin`);
+
 renderCard(adsData);
+
+disableElements();
+
+(function () {
+  const ENTER_KEYCODE = 13;
+
+  mainPinMap.addEventListener(`keydown`, function (evt) {
+    evt.preventDefault();
+    if (ENTER_KEYCODE) {
+      activatePage();
+    }
+  });
+  mapPins.forEach(function (mapPin) {
+    mapPin.addEventListener(`mousedown`, function (evt) {
+      evt.preventDefault();
+      let x = parseInt(evt.currentTarget.style.left, 10);
+      let y = parseInt(evt.currentTarget.style.top, 10);
+      if (mapPin.classList.contains(`map__pin--main`)) {
+        x += 32.5;
+        y += 32.5;
+      } else {
+        x += 25;
+        y += 70;
+      }
+      setAddress(x, y);
+    });
+  });
+
+  mainPinMap.addEventListener(`mousedown`, function (evt) {
+    evt.preventDefault();
+    activatePage();
+  });
+
+})();
+
