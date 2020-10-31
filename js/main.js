@@ -2,6 +2,18 @@
 
 const ADS_NUM = 8;
 
+const ENTER_KEYCODE = 13;
+
+const MIN_PIN_HEIGHT = 70;
+
+const MIN_PIN_WIDTH = 50;
+
+const BIG_PIN_WIDTH = 65;
+
+const BIG_PIN_HEIGHT = 65;
+
+const LEFT_MOUSE_BUTTON_CODE = 0;
+
 const pinTemplate = document.querySelector(`#pin`).content;
 
 const map = document.querySelector(`.map`);
@@ -10,34 +22,35 @@ const mapPinsContainer = map.querySelector(`.map__pins`);
 
 const mapFiltersContainer = map.querySelector(`.map__filters-container`);
 
-const mapFiltersForm = mapFiltersContainer.querySelector(`.map__filters`);
+const adForm = document.querySelector(`.ad-form`);
 
-const adFormNotice = document.querySelector(`.ad-form`);
+const fieldsets = adForm.querySelectorAll(`fieldset`);
 
 const address = document.querySelector(`#address`);
 
 const mainPinMap = document.querySelector(`.map__pin--main`);
 
-const form = document.querySelector(`.ad-form`);
+const guestsSelect = adForm.querySelector(`#capacity`);
 
-const guestsSelect = form.querySelector(`#capacity`);
-
-const roomsSelect = form.querySelector(`#room_number`);
+const roomsSelect = adForm.querySelector(`#room_number`);
 
 
 const validateCapacity = function () {
   const guestsValue = Number.parseInt(guestsSelect.value, 10);
   const roomsValue = Number.parseInt(roomsSelect.value, 10);
 
-  if (roomsValue === 1 && guestsValue >= 3) {
+  if ((roomsValue === 1 && guestsValue > 1)
+   || (roomsValue === 2 && guestsValue > 2)
+   || (roomsValue === 3 && guestsValue > 3)) {
     guestsSelect.setCustomValidity(`Слишком много гостей для этого количества комнат`);
+  } else if (roomsValue === 100 && guestsValue !== 0) {
+    guestsSelect.setCustomValidity(`100 комнат не для гостей`);
   } else {
     guestsSelect.setCustomValidity(``);
   }
-
 };
 
-form.addEventListener(`change`, function (evt) {
+adForm.addEventListener(`change`, function (evt) {
   switch (evt.target) {
     case guestsSelect:
     case roomsSelect:
@@ -151,20 +164,18 @@ const createAdsData = (length) => {
 const renderPins = function (data) {
   const fragment = document.createDocumentFragment();
 
-  for (let i = 0; i < data.length; i++) {
-
+  data.forEach(function (dataElement) {
     const element = pinTemplate.cloneNode(true);
-    const elementData = data[i];
-
     const button = element.querySelector(`.map__pin`);
-    button.setAttribute(`style`, `left: ` + elementData.location.x + `px; top: ` + elementData.location.y + `px`);
+    button.setAttribute(`style`, `left: ` + dataElement.location.x + `px; top: ` + dataElement.location.y + `px`);
 
     const img = element.querySelector(`img`);
-    img.src = elementData.author.avatar;
-    img.alt = elementData.offer.title;
+    img.src = dataElement.author.avatar;
+    img.alt = dataElement.offer.title;
 
     fragment.appendChild(element);
-  }
+  });
+
 
   mapPinsContainer.appendChild(fragment);
 };
@@ -248,12 +259,10 @@ const renderCard = function (data) {
   const featureContainer = element.querySelector(`.popup__features`);
   featureContainer.innerHTML = ``;
   if (offer.features.length > 0) {
-
-    for (let i = 0; i < offer.features.length; i++) {
-      const featureElement = getFeatureElement(offer.features[i]);
+    offer.features.forEach(function (feature) {
+      const featureElement = getFeatureElement(feature);
       featureContainer.appendChild(featureElement);
-    }
-
+    });
   } else {
     hideElement(featureContainer);
   }
@@ -283,11 +292,10 @@ const renderCard = function (data) {
     };
 
     photosContainer.innerHTML = ``;
-
-    for (let i = 0; i < offer.photos.length; i++) {
-      const img = createImg(offer.photos[i]);
+    offer.photos.forEach(function (photo) {
+      const img = createImg(photo);
       photosContainer.appendChild(img);
-    }
+    });
   } else {
     hideElement(photosContainer);
   }
@@ -295,42 +303,33 @@ const renderCard = function (data) {
   map.insertBefore(element, mapFiltersContainer);
 };
 
-const disableElements = function () {
-  const fieldsets = document.querySelectorAll(`fieldset`);
-  for (let i = 0; i < fieldsets.length; i++) {
-    const element = fieldsets[i];
-    element.setAttribute(`disabled`, `true`);
-  }
-  document.querySelector(`.map__filters`).classList.add(`map__filters--disabled`);
-  document.querySelector(`.ad-form`).classList.add(`ad-form--disabled`);
+const disableAdForm = function () {
+  adForm.classList.add(`ad-form--disabled`);
+  fieldsets.forEach(function (fieldset) {
+    fieldset.setAttribute(`disabled`, `true`);
+  });
 };
 
-const enableFieldsets = function () {
-  const fieldsets = document.querySelectorAll(`fieldset`);
-  for (let i = 0; i < fieldsets.length; i++) {
-    const element = fieldsets[i];
-    element.removeAttribute(`disabled`);
-  }
+const disableElements = function () {
+  disableAdForm();
+  document.querySelector(`.map__filters`).classList.add(`map__filters--disabled`);
+};
+
+const enableAdForm = function () {
+  fieldsets.forEach(function (fieldset) {
+    fieldset.removeAttribute(`disabled`);
+  });
+  adForm.classList.remove(`ad-form--disabled`);
 };
 
 const activatePage = function () {
-  enableFieldsets();
+  enableAdForm();
   map.classList.remove(`map--faded`);
-  mapFiltersForm.classList.remove(`map__filters--disabled`);
-  adFormNotice.classList.remove(`ad-form--disabled`);
 };
 
 const setAddress = function (x, y) {
   address.value = `${x}, ${y}`;
 };
-
-
-mainPinMap.addEventListener(`keydown`, function (evt) {
-  evt.preventDefault();
-  if (evt.keyCode === 13) {
-    activatePage();
-  }
-});
 
 const adsData = createAdsData(ADS_NUM);
 renderPins(adsData);
@@ -339,37 +338,40 @@ const mapPins = document.querySelectorAll(`.map__pin`);
 
 renderCard(adsData);
 
-disableElements();
+const initApp = function () {
 
-(function () {
-  const ENTER_KEYCODE = 13;
+  disableElements();
 
-  mainPinMap.addEventListener(`keydown`, function (evt) {
-    evt.preventDefault();
-    if (ENTER_KEYCODE) {
-      activatePage();
-    }
-  });
-  mapPins.forEach(function (mapPin) {
-    mapPin.addEventListener(`mousedown`, function (evt) {
+  (function () {
+    mainPinMap.addEventListener(`keydown`, function (evt) {
       evt.preventDefault();
-      let x = parseInt(evt.currentTarget.style.left, 10);
-      let y = parseInt(evt.currentTarget.style.top, 10);
-      if (mapPin.classList.contains(`map__pin--main`)) {
-        x += 32.5;
-        y += 32.5;
-      } else {
-        x += 25;
-        y += 70;
+      if (ENTER_KEYCODE) {
+        activatePage();
       }
-      setAddress(x, y);
     });
-  });
+    mapPins.forEach(function (mapPin) {
+      mapPin.addEventListener(`mousedown`, function (evt) {
+        if (evt.button === LEFT_MOUSE_BUTTON_CODE) {
+          evt.preventDefault();
+          let x = Number.parseInt(evt.currentTarget.style.left, 10);
+          let y = Number.parseInt(evt.currentTarget.style.top, 10);
+          if (mapPin.classList.contains(`map__pin--main`)) {
+            x += BIG_PIN_WIDTH / 2;
+            y += BIG_PIN_HEIGHT / 2;
+          } else {
+            x += MIN_PIN_WIDTH / 2;
+            y += MIN_PIN_HEIGHT;
+          }
+          setAddress(x, y);
+        }
+      });
+    });
 
-  mainPinMap.addEventListener(`mousedown`, function (evt) {
-    evt.preventDefault();
-    activatePage();
-  });
+    mainPinMap.addEventListener(`mousedown`, function (evt) {
+      evt.preventDefault();
+      activatePage();
+    });
+  })();
+};
 
-})();
-
+initApp();
