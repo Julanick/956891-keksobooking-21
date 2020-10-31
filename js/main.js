@@ -4,10 +4,6 @@ const ADS_NUM = 8;
 
 const ENTER_KEYCODE = 13;
 
-const MIN_PIN_HEIGHT = 70;
-
-const MIN_PIN_WIDTH = 50;
-
 const BIG_PIN_WIDTH = 65;
 
 const BIG_PIN_HEIGHT = 65;
@@ -34,20 +30,39 @@ const guestsSelect = adForm.querySelector(`#capacity`);
 
 const roomsSelect = adForm.querySelector(`#room_number`);
 
+let isAppActive = false;
 
-const validateCapacity = function () {
-  const guestsValue = Number.parseInt(guestsSelect.value, 10);
-  const roomsValue = Number.parseInt(roomsSelect.value, 10);
+const RoomsAmount = {
+  ONE: `1`,
+  TWO: `2`,
+  THREE: `3`,
+  HUNDRED: `100`
+};
 
-  if ((roomsValue === 1 && guestsValue > 1)
-   || (roomsValue === 2 && guestsValue > 2)
-   || (roomsValue === 3 && guestsValue > 3)) {
-    guestsSelect.setCustomValidity(`Слишком много гостей для этого количества комнат`);
-  } else if (roomsValue === 100 && guestsValue !== 0) {
-    guestsSelect.setCustomValidity(`100 комнат не для гостей`);
-  } else {
-    guestsSelect.setCustomValidity(``);
+const GuestsAmount = {
+  ONE: `1`,
+  TWO: `2`,
+  THREE: `3`,
+  NOT_FOR_GUEST: `0`
+};
+
+const validateCapacity = () => {
+  const guestsValue = guestsSelect.value;
+  const roomsValue = roomsSelect.value;
+
+  let error = ``;
+
+  if (roomsValue === RoomsAmount.ONE && guestsValue !== GuestsAmount.ONE) {
+    error = `1 комната только для 1-го гостя`;
+  } else if (roomsValue === RoomsAmount.TWO && (guestsValue === GuestsAmount.THREE || guestsValue === GuestsAmount.NOT_FOR_GUEST)) {
+    error = `2 комнаты для 1-го или 2-ух гостей`;
+  } else if (roomsValue === RoomsAmount.THREE && guestsValue === GuestsAmount.NOT_FOR_GUEST) {
+    error = `3 комнаты для 1-го, 2-ух или 3-ех гостей`;
+  } else if (roomsValue === RoomsAmount.HUNDRED && guestsValue !== GuestsAmount.NOT_FOR_GUEST) {
+    error = `Это помещение не для гостей`;
   }
+
+  guestsSelect.setCustomValidity(error);
 };
 
 adForm.addEventListener(`change`, function (evt) {
@@ -310,11 +325,6 @@ const disableAdForm = function () {
   });
 };
 
-const disableElements = function () {
-  disableAdForm();
-  document.querySelector(`.map__filters`).classList.add(`map__filters--disabled`);
-};
-
 const enableAdForm = function () {
   fieldsets.forEach(function (fieldset) {
     fieldset.removeAttribute(`disabled`);
@@ -322,56 +332,48 @@ const enableAdForm = function () {
   adForm.classList.remove(`ad-form--disabled`);
 };
 
-const activatePage = function () {
+const activateApp = function () {
   enableAdForm();
   map.classList.remove(`map--faded`);
+  isAppActive = true;
+  setAddress();
 };
 
-const setAddress = function (x, y) {
+const setAddress = function () {
+  let x = Number.parseInt(mainPinMap.style.left, 10);
+  let y = Number.parseInt(mainPinMap.style.top, 10);
+  if (isAppActive === false) {
+    x += BIG_PIN_WIDTH / 2;
+    y += BIG_PIN_HEIGHT / 2;
+  } else {
+    x += BIG_PIN_WIDTH / 2;
+    y += BIG_PIN_HEIGHT;
+  }
   address.value = `${x}, ${y}`;
 };
 
 const adsData = createAdsData(ADS_NUM);
+
 renderPins(adsData);
-
-const mapPins = document.querySelectorAll(`.map__pin`);
-
 renderCard(adsData);
 
 const initApp = function () {
+  disableAdForm();
+  setAddress();
 
-  disableElements();
+  mainPinMap.addEventListener(`keydown`, function (evt) {
+    evt.preventDefault();
+    if (ENTER_KEYCODE) {
+      activateApp();
+    }
+  });
 
-  (function () {
-    mainPinMap.addEventListener(`keydown`, function (evt) {
+  mainPinMap.addEventListener(`mousedown`, function (evt) {
+    if (evt.button === LEFT_MOUSE_BUTTON_CODE) {
       evt.preventDefault();
-      if (ENTER_KEYCODE) {
-        activatePage();
-      }
-    });
-    mapPins.forEach(function (mapPin) {
-      mapPin.addEventListener(`mousedown`, function (evt) {
-        if (evt.button === LEFT_MOUSE_BUTTON_CODE) {
-          evt.preventDefault();
-          let x = Number.parseInt(evt.currentTarget.style.left, 10);
-          let y = Number.parseInt(evt.currentTarget.style.top, 10);
-          if (mapPin.classList.contains(`map__pin--main`)) {
-            x += BIG_PIN_WIDTH / 2;
-            y += BIG_PIN_HEIGHT / 2;
-          } else {
-            x += MIN_PIN_WIDTH / 2;
-            y += MIN_PIN_HEIGHT;
-          }
-          setAddress(x, y);
-        }
-      });
-    });
-
-    mainPinMap.addEventListener(`mousedown`, function (evt) {
-      evt.preventDefault();
-      activatePage();
-    });
-  })();
+      activateApp();
+    }
+  });
 };
 
 initApp();
