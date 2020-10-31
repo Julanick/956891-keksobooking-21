@@ -2,6 +2,14 @@
 
 const ADS_NUM = 8;
 
+const ENTER_KEYCODE = 13;
+
+const BIG_PIN_WIDTH = 65;
+
+const BIG_PIN_HEIGHT = 65;
+
+const LEFT_MOUSE_BUTTON_CODE = 0;
+
 const pinTemplate = document.querySelector(`#pin`).content;
 
 const map = document.querySelector(`.map`);
@@ -9,6 +17,62 @@ const map = document.querySelector(`.map`);
 const mapPinsContainer = map.querySelector(`.map__pins`);
 
 const mapFiltersContainer = map.querySelector(`.map__filters-container`);
+
+const adForm = document.querySelector(`.ad-form`);
+
+const fieldsets = adForm.querySelectorAll(`fieldset`);
+
+const address = document.querySelector(`#address`);
+
+const mainPinMap = document.querySelector(`.map__pin--main`);
+
+const guestsSelect = adForm.querySelector(`#capacity`);
+
+const roomsSelect = adForm.querySelector(`#room_number`);
+
+let isAppActive = false;
+
+const RoomsAmount = {
+  ONE: `1`,
+  TWO: `2`,
+  THREE: `3`,
+  HUNDRED: `100`
+};
+
+const GuestsAmount = {
+  ONE: `1`,
+  TWO: `2`,
+  THREE: `3`,
+  NOT_FOR_GUEST: `0`
+};
+
+const validateCapacity = () => {
+  const guestsValue = guestsSelect.value;
+  const roomsValue = roomsSelect.value;
+
+  let error = ``;
+
+  if (roomsValue === RoomsAmount.ONE && guestsValue !== GuestsAmount.ONE) {
+    error = `1 комната только для 1-го гостя`;
+  } else if (roomsValue === RoomsAmount.TWO && (guestsValue === GuestsAmount.THREE || guestsValue === GuestsAmount.NOT_FOR_GUEST)) {
+    error = `2 комнаты для 1-го или 2-ух гостей`;
+  } else if (roomsValue === RoomsAmount.THREE && guestsValue === GuestsAmount.NOT_FOR_GUEST) {
+    error = `3 комнаты для 1-го, 2-ух или 3-ех гостей`;
+  } else if (roomsValue === RoomsAmount.HUNDRED && guestsValue !== GuestsAmount.NOT_FOR_GUEST) {
+    error = `Это помещение не для гостей`;
+  }
+
+  guestsSelect.setCustomValidity(error);
+};
+
+adForm.addEventListener(`change`, function (evt) {
+  switch (evt.target) {
+    case guestsSelect:
+    case roomsSelect:
+      validateCapacity();
+      break;
+  }
+});
 
 const cardTemplate = document.querySelector(`#card`).content;
 
@@ -115,20 +179,18 @@ const createAdsData = (length) => {
 const renderPins = function (data) {
   const fragment = document.createDocumentFragment();
 
-  for (let i = 0; i < data.length; i++) {
-
+  data.forEach(function (dataElement) {
     const element = pinTemplate.cloneNode(true);
-    const elementData = data[i];
-
     const button = element.querySelector(`.map__pin`);
-    button.setAttribute(`style`, `left: ` + elementData.location.x + `px; top: ` + elementData.location.y + `px`);
+    button.setAttribute(`style`, `left: ` + dataElement.location.x + `px; top: ` + dataElement.location.y + `px`);
 
     const img = element.querySelector(`img`);
-    img.src = elementData.author.avatar;
-    img.alt = elementData.offer.title;
+    img.src = dataElement.author.avatar;
+    img.alt = dataElement.offer.title;
 
     fragment.appendChild(element);
-  }
+  });
+
 
   mapPinsContainer.appendChild(fragment);
 };
@@ -159,11 +221,11 @@ const renderCard = function (data) {
     hideElement(title);
   }
 
-  const address = element.querySelector(`.popup__text--address`);
+  const addressPopup = element.querySelector(`.popup__text--address`);
   if (offer.address) {
-    address.innerText = offer.address;
+    addressPopup.innerText = offer.address;
   } else {
-    hideElement(address);
+    hideElement(addressPopup);
   }
 
   const price = element.querySelector(`.popup__text--price`);
@@ -212,12 +274,10 @@ const renderCard = function (data) {
   const featureContainer = element.querySelector(`.popup__features`);
   featureContainer.innerHTML = ``;
   if (offer.features.length > 0) {
-
-    for (let i = 0; i < offer.features.length; i++) {
-      const featureElement = getFeatureElement(offer.features[i]);
+    offer.features.forEach(function (feature) {
+      const featureElement = getFeatureElement(feature);
       featureContainer.appendChild(featureElement);
-    }
-
+    });
   } else {
     hideElement(featureContainer);
   }
@@ -247,11 +307,10 @@ const renderCard = function (data) {
     };
 
     photosContainer.innerHTML = ``;
-
-    for (let i = 0; i < offer.photos.length; i++) {
-      const img = createImg(offer.photos[i]);
+    offer.photos.forEach(function (photo) {
+      const img = createImg(photo);
       photosContainer.appendChild(img);
-    }
+    });
   } else {
     hideElement(photosContainer);
   }
@@ -259,7 +318,62 @@ const renderCard = function (data) {
   map.insertBefore(element, mapFiltersContainer);
 };
 
+const disableAdForm = function () {
+  adForm.classList.add(`ad-form--disabled`);
+  fieldsets.forEach(function (fieldset) {
+    fieldset.setAttribute(`disabled`, `true`);
+  });
+};
+
+const enableAdForm = function () {
+  fieldsets.forEach(function (fieldset) {
+    fieldset.removeAttribute(`disabled`);
+  });
+  adForm.classList.remove(`ad-form--disabled`);
+};
+
+const activateApp = function () {
+  enableAdForm();
+  map.classList.remove(`map--faded`);
+  isAppActive = true;
+  setAddress();
+};
+
+const setAddress = function () {
+  let x = Number.parseInt(mainPinMap.style.left, 10);
+  let y = Number.parseInt(mainPinMap.style.top, 10);
+  if (isAppActive === false) {
+    x += BIG_PIN_WIDTH / 2;
+    y += BIG_PIN_HEIGHT / 2;
+  } else {
+    x += BIG_PIN_WIDTH / 2;
+    y += BIG_PIN_HEIGHT;
+  }
+  address.value = `${x}, ${y}`;
+};
+
 const adsData = createAdsData(ADS_NUM);
 
 renderPins(adsData);
 renderCard(adsData);
+
+const initApp = function () {
+  disableAdForm();
+  setAddress();
+
+  mainPinMap.addEventListener(`keydown`, function (evt) {
+    evt.preventDefault();
+    if (ENTER_KEYCODE) {
+      activateApp();
+    }
+  });
+
+  mainPinMap.addEventListener(`mousedown`, function (evt) {
+    if (evt.button === LEFT_MOUSE_BUTTON_CODE) {
+      evt.preventDefault();
+      activateApp();
+    }
+  });
+};
+
+initApp();
