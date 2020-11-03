@@ -1163,6 +1163,7 @@ fieldset {
   background-color: rgba(0, 0, 0, 0.8);
 }
 
+.additional__message,
 .success__message,
 .error__message {
   position: relative;
