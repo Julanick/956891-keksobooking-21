@@ -1,4 +1,11 @@
 "use strict";
+const ERROR_200 = 200;
+const ERROR_400 = 400;
+const ERROR_401 = 401;
+const ERROR_404 = 404;
+const TIMEOUT_MS = 10000;
+
+
 (function () {
   window.load = function (url, onSuccess, onError) {
     let xhr = new XMLHttpRequest();
@@ -8,17 +15,16 @@
     xhr.addEventListener(`load`, function () {
       let error;
       switch (xhr.status) {
-        case 200:
+        case ERROR_200:
           onSuccess(xhr.response);
           break;
-
-        case 400:
+        case ERROR_400:
           error = `Неверный запрос`;
           break;
-        case 401:
+        case ERROR_401:
           error = `Пользователь не авторизован`;
           break;
-        case 404:
+        case ERROR_404:
           error = `Ничего не найдено`;
           break;
 
@@ -39,7 +45,7 @@
       onError(`Запрос не успел выполниться за ` + xhr.timeout + `мс`);
     });
 
-    xhr.timeout = 10000;
+    xhr.timeout = TIMEOUT_MS;
 
     xhr.open(`GET`, url);
     xhr.send();
