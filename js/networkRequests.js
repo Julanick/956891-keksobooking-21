@@ -7,11 +7,8 @@ const TIMEOUT_MS = 10000;
 
 
 (function () {
-  window.load = function (url, onSuccess, onError) {
-    let xhr = new XMLHttpRequest();
 
-    xhr.responseType = `json`;
-
+  const subscribeCallbacks = function (xhr, onSuccess, onError) {
     xhr.addEventListener(`load`, function () {
       let error;
       switch (xhr.status) {
@@ -44,8 +41,27 @@ const TIMEOUT_MS = 10000;
     xhr.addEventListener(`timeout`, function () {
       onError(`Запрос не успел выполниться за ` + xhr.timeout + `мс`);
     });
+  };
 
+  window.sendForm = function (url, onSuccess, onError, formElement) {
+    let xhr = new XMLHttpRequest();
+
+    xhr.responseType = `json`;
     xhr.timeout = TIMEOUT_MS;
+
+    subscribeCallbacks(xhr, onSuccess, onError);
+
+    xhr.open(`POST`, url);
+    xhr.send(new FormData(formElement));
+  };
+
+  window.load = function (url, onSuccess, onError) {
+    let xhr = new XMLHttpRequest();
+
+    xhr.responseType = `json`;
+    xhr.timeout = TIMEOUT_MS;
+
+    subscribeCallbacks(xhr, onSuccess, onError);
 
     xhr.open(`GET`, url);
     xhr.send();

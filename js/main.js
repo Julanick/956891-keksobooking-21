@@ -1,5 +1,5 @@
 "use strict";
-const URL_DATA = `https://21.javascript.pages.academy/keksobooking/datas`;
+const URL_DATA = `https://21.javascript.pages.academy/keksobooking/data`;
 
 const map = document.querySelector(`.map`);
 const mainPinMap = map.querySelector(`.map__pin--main`);
@@ -28,6 +28,11 @@ const initApp = function () {
       evt.preventDefault();
       activateApp();
     }
+  });
+
+  window.form.formObject.addEventListener(`submit`, function (evt) {
+    evt.preventDefault();
+    window.form.sendForm();
   });
 };
 
