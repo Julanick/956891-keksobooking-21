@@ -9,6 +9,7 @@
   const address = document.querySelector(`#address`);
 
   const adForm = document.querySelector(`.ad-form`);
+
   const fieldsets = adForm.querySelectorAll(`fieldset`);
 
   const disableAdForm = function () {
@@ -41,6 +42,7 @@
   window.form = {
     disableAdForm,
     enableAdForm,
-    setAddress
+    setAddress,
+    adForm
   };
 })();

@@ -1,12 +1,10 @@
 "use strict";
-const URL_DATA = `https://21.javascript.pages.academy/keksobooking/datas`;
-
 const map = document.querySelector(`.map`);
 const mainPinMap = map.querySelector(`.map__pin--main`);
 
-
 const activateApp = function () {
   window.form.enableAdForm();
+  window.networkRequests.loadAds(onAddsLoadSuccess, onAddsLoadError);
   map.classList.remove(`map--faded`);
   window.globalVariables.isAppActive = true;
   window.form.setAddress();
@@ -29,6 +27,11 @@ const initApp = function () {
       activateApp();
     }
   });
+
+  window.form.adForm.addEventListener(`submit`, function (evt) {
+    evt.preventDefault();
+    window.networkRequests.uploadAd(onSendFormSuccess, onSendFormError, window.form.adForm);
+  });
 };
 
 const onAddsLoadSuccess = function (data) {
@@ -40,6 +43,12 @@ const onAddsLoadError = function (errorMessage) {
   window.messages.showErrorMessage(errorMessage);
 };
 
-window.load(URL_DATA, onAddsLoadSuccess, onAddsLoadError);
+const onSendFormSuccess = function () {
+  window.messages.showFormSubmitSuccessMessage();
+};
+
+const onSendFormError = function (error) {
+  window.messages.showFormSubmitErrorMessage(error);
+};
 
 initApp();
