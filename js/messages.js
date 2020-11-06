@@ -1,7 +1,7 @@
 "use strict";
 (function () {
 
-  const wrapper = document.querySelector(`#errorMessageWrapper`);
+  const main = document.querySelector(`main`);
   const error = document.querySelector(`#errorMessage`).content;
   const formError = document.querySelector(`#error`).content;
   const formSuccess = document.querySelector(`#success`).content;
@@ -9,32 +9,37 @@
   let activeMessage = null;
 
   const removeActiveMessage = () => {
-    wrapper.innerHTML = ``;
+    activeMessage.remove();
     activeMessage = null;
   };
 
   const showErrorMessage = (text) => {
-    activeMessage = error.cloneNode(true);
+    const message = error.cloneNode(true);
+    activeMessage = message.firstElementChild;
     activeMessage.querySelector(`.additional__message`).innerText = text;
     const closeButton = activeMessage.querySelector(`.ok-button`);
     document.addEventListener(`keydown`, onDocumentEscKeydown);
+    document.addEventListener(`click`, onDocumentleftMouseClick);
     closeButton.addEventListener(`click`, removeActiveMessage);
-    wrapper.appendChild(activeMessage);
+    main.appendChild(activeMessage);
   };
 
-  const showFormSubmitSuccesMessage = () => {
-    activeMessage = formSuccess.cloneNode(true);
+  const showFormSubmitSuccessMessage = () => {
+    const message = formSuccess.cloneNode(true);
+    activeMessage = message.firstElementChild;
     document.addEventListener(`keydown`, onDocumentEscKeydown);
     document.addEventListener(`click`, onDocumentleftMouseClick);
-    wrapper.appendChild(activeMessage);
+    main.appendChild(activeMessage);
   };
 
   const showFormSubmitErrorMessage = () => {
-    activeMessage = formError.cloneNode(true);
+    const message = formError.cloneNode(true);
+    activeMessage = message.firstElementChild;
     const closeButton = activeMessage.querySelector(`.error__button`);
     document.addEventListener(`keydown`, onDocumentEscKeydown);
+    document.addEventListener(`click`, onDocumentleftMouseClick);
     closeButton.addEventListener(`click`, removeActiveMessage);
-    wrapper.appendChild(activeMessage);
+    main.appendChild(activeMessage);
   };
 
   const onDocumentEscKeydown = (evt) => {
@@ -53,7 +58,7 @@
 
   window.messages = {
     showErrorMessage,
-    showFormSubmitSuccesMessage,
+    showFormSubmitSuccessMessage,
     showFormSubmitErrorMessage
   };
 })();

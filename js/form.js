@@ -9,9 +9,8 @@
   const address = document.querySelector(`#address`);
 
   const adForm = document.querySelector(`.ad-form`);
-  const fieldsets = adForm.querySelectorAll(`fieldset`);
 
-  const SEND_FORM_URL = `https://21.javascript.pages.academy/keksobooking`;
+  const fieldsets = adForm.querySelectorAll(`fieldset`);
 
   const disableAdForm = function () {
     adForm.classList.add(`ad-form--disabled`);
@@ -40,24 +39,10 @@
     address.value = `${Math.round(x)}, ${Math.round(y)}`;
   };
 
-  const onSendFormSucccses = function () {
-    window.messages.showFormSubmitSuccesMessage();
-  };
-
-  const onSendFormError = function (error) {
-    window.messages.showFormSubmitErrorMessage(error);
-  };
-
-  const sendForm = function () {
-    window.sendForm(SEND_FORM_URL, onSendFormSucccses, onSendFormError, adForm);
-  };
-
-
   window.form = {
     disableAdForm,
     enableAdForm,
     setAddress,
-    formObject: adForm,
-    sendForm
+    adForm
   };
 })();
