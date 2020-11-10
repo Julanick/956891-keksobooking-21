@@ -6,13 +6,6 @@ const AD_UPLOAD_URL = `https://21.javascript.pages.academy/keksobooking`;
 
 const TIMEOUT_MS = 10000;
 
-const XhrStatus = {
-  OK: 200,
-  BAD_REQUEST: 400,
-  UNAUTHORIZED: 401,
-  NOT_FOUND: 404,
-};
-
 (function () {
   const prepareXhr = function (onSuccess, onError) {
     const xhr = new XMLHttpRequest();
@@ -23,16 +16,16 @@ const XhrStatus = {
     xhr.addEventListener(`load`, function () {
       let error;
       switch (xhr.status) {
-        case XhrStatus.OK:
+        case window.enums.XhrStatus.OK:
           onSuccess(xhr.response);
           break;
-        case XhrStatus.BAD_REQUEST:
+        case window.enums.XhrStatus.BAD_REQUEST:
           error = `Неверный запрос`;
           break;
-        case XhrStatus.UNAUTHORIZED:
+        case window.enums.XhrStatus.UNAUTHORIZED:
           error = `Пользователь не авторизован`;
           break;
-        case XhrStatus.NOT_FOUND:
+        case window.enums.XhrStatus.NOT_FOUND:
           error = `Ничего не найдено`;
           break;
         default:

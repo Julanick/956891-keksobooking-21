@@ -9,8 +9,10 @@
   let activeMessage = null;
 
   const removeActiveMessage = () => {
-    activeMessage.remove();
-    activeMessage = null;
+    if (activeMessage) {
+      activeMessage.remove();
+      activeMessage = null;
+    }
   };
 
   const showErrorMessage = (text) => {
