@@ -8,8 +8,8 @@
   const mainPinMap = map.querySelector(`.map__pin--main`);
   const mapPinsContainer = map.querySelector(`.map__pins`);
 
-  const MIN_Y_COORDINATE = 130 - window.enums.PinSize.HEIGHT;
-  const MAX_Y_COORDINATE = 630 - window.enums.PinSize.HEIGHT;
+  const MIN_Y_COORDINATE = 130;
+  const MAX_Y_COORDINATE = 630;
   const MIN_X_COORDINATE = 0 - window.enums.PinSize.WIDTH / 2;
   const MAX_X_COORDINATE = 1200 - window.enums.PinSize.WIDTH / 2;
 
