@@ -1,9 +1,5 @@
 "use strict";
 (function () {
-  const BIG_PIN_WIDTH = 65;
-
-  const BIG_PIN_HEIGHT = 65;
-
   const mainPinMap = document.querySelector(`.map__pin--main`);
 
   const address = document.querySelector(`#address`);
@@ -30,11 +26,10 @@
     let x = Number.parseInt(mainPinMap.style.left, 10);
     let y = Number.parseInt(mainPinMap.style.top, 10);
     if (window.globalVariables.isAppActive) {
-      x += BIG_PIN_WIDTH / 2;
-      y += BIG_PIN_HEIGHT / 2;
+      x += window.enums.PinSize.WIDTH / 2;
     } else {
-      x += BIG_PIN_WIDTH / 2;
-      y += BIG_PIN_HEIGHT;
+      x += window.enums.PinSize.WIDTH / 2;
+      y += window.enums.PinSize.HEIGHT / 2;
     }
     address.value = `${Math.round(x)}, ${Math.round(y)}`;
   };

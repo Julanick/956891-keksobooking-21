@@ -4,11 +4,79 @@
   let activePin = null;
 
   const pinTemplate = document.querySelector(`#pin`).content;
-
   const map = document.querySelector(`.map`);
   const mainPinMap = map.querySelector(`.map__pin--main`);
-
   const mapPinsContainer = map.querySelector(`.map__pins`);
+
+  const MIN_Y_COORDINATE = 130;
+  const MAX_Y_COORDINATE = 630;
+  const MIN_X_COORDINATE = 0 - window.enums.PinSize.WIDTH / 2;
+  const MAX_X_COORDINATE = 1200 - window.enums.PinSize.WIDTH / 2;
+
+  mainPinMap.addEventListener(`mousedown`, function (evt) {
+    evt.preventDefault();
+
+    let startCoords = {
+      x: evt.clientX,
+      y: evt.clientY
+    };
+
+    let dragged = false;
+
+    let onMouseMove = function (moveEvt) {
+      moveEvt.preventDefault();
+
+      dragged = true;
+
+      let shift = {
+        x: startCoords.x - moveEvt.clientX,
+        y: startCoords.y - moveEvt.clientY
+      };
+
+      startCoords = {
+        x: moveEvt.clientX,
+        y: moveEvt.clientY
+      };
+
+      let top = mainPinMap.offsetTop - shift.y;
+      let left = mainPinMap.offsetLeft - shift.x;
+
+      if (top <= MIN_Y_COORDINATE) {
+        top = MIN_Y_COORDINATE;
+      }
+      if (top >= MAX_Y_COORDINATE) {
+        top = MAX_Y_COORDINATE;
+      }
+      if (left <= MIN_X_COORDINATE) {
+        left = MIN_X_COORDINATE;
+      }
+      if (left >= MAX_X_COORDINATE) {
+        left = MAX_X_COORDINATE;
+      }
+
+      mainPinMap.style.top = top + `px`;
+      mainPinMap.style.left = left + `px`;
+    };
+
+    let onMouseUp = function (upEvt) {
+      upEvt.preventDefault();
+
+      document.removeEventListener(`mousemove`, onMouseMove);
+      document.removeEventListener(`mouseup`, onMouseUp);
+
+      if (dragged) {
+        let onClickPreventDefault = function (clickEvt) {
+          clickEvt.preventDefault();
+          mainPinMap.removeEventListener(`click`, onClickPreventDefault);
+        };
+        mainPinMap.addEventListener(`click`, onClickPreventDefault);
+        window.form.setAddress();
+      }
+    };
+
+    document.addEventListener(`mousemove`, onMouseMove);
+    document.addEventListener(`mouseup`, onMouseUp);
+  });
 
   const renderPins = function (data) {
     const fragment = document.createDocumentFragment();
