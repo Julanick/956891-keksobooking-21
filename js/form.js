@@ -27,6 +27,7 @@
     let y = Number.parseInt(mainPinMap.style.top, 10);
     if (window.globalVariables.isAppActive) {
       x += window.enums.PinSize.WIDTH / 2;
+      y += window.enums.PinSize.HEIGHT;
     } else {
       x += window.enums.PinSize.WIDTH / 2;
       y += window.enums.PinSize.HEIGHT / 2;

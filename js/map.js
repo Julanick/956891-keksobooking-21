@@ -8,8 +8,8 @@
   const mainPinMap = map.querySelector(`.map__pin--main`);
   const mapPinsContainer = map.querySelector(`.map__pins`);
 
-  const MIN_Y_COORDINATE = 130;
-  const MAX_Y_COORDINATE = 630;
+  const MIN_Y_COORDINATE = 130 - window.enums.PinSize.HEIGHT;
+  const MAX_Y_COORDINATE = 630 - window.enums.PinSize.HEIGHT;
   const MIN_X_COORDINATE = 0 - window.enums.PinSize.WIDTH / 2;
   const MAX_X_COORDINATE = 1200 - window.enums.PinSize.WIDTH / 2;
 
@@ -23,12 +23,12 @@
 
     let dragged = false;
 
-    let onMouseMove = function (moveEvt) {
+    const onMouseMove = function (moveEvt) {
       moveEvt.preventDefault();
 
       dragged = true;
 
-      let shift = {
+      const shift = {
         x: startCoords.x - moveEvt.clientX,
         y: startCoords.y - moveEvt.clientY
       };
@@ -58,14 +58,14 @@
       mainPinMap.style.left = left + `px`;
     };
 
-    let onMouseUp = function (upEvt) {
+    const onMouseUp = function (upEvt) {
       upEvt.preventDefault();
 
       document.removeEventListener(`mousemove`, onMouseMove);
       document.removeEventListener(`mouseup`, onMouseUp);
 
       if (dragged) {
-        let onClickPreventDefault = function (clickEvt) {
+        const onClickPreventDefault = function (clickEvt) {
           clickEvt.preventDefault();
           mainPinMap.removeEventListener(`click`, onClickPreventDefault);
         };
@@ -85,7 +85,9 @@
       const element = pinTemplate.cloneNode(true);
       element.firstElementChild.dataset.id = dataElement.id;
       const button = element.querySelector(`.map__pin`);
-      button.setAttribute(`style`, `left: ` + dataElement.location.x + `px; top: ` + dataElement.location.y + `px`);
+      const left = dataElement.location.x - window.enums.PinSize.WIDTH / 2;
+      const top = dataElement.location.y - window.enums.PinSize.HEIGHT;
+      button.setAttribute(`style`, `left: ` + left + `px; top: ` + top + `px`);
 
       const img = element.querySelector(`img`);
       img.src = dataElement.author.avatar;
