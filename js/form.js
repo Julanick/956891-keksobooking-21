@@ -39,10 +39,24 @@
     address.value = `${Math.round(x)}, ${Math.round(y)}`;
   };
 
+  const onSendFormSuccess = function () {
+    window.messages.showFormSubmitSuccessMessage();
+  };
+
+  const onSendFormError = function (error) {
+    window.messages.showFormSubmitErrorMessage(error);
+  };
+
+  const submit = function () {
+    const formData = new FormData(adForm);
+    window.networkRequests.uploadAd(onSendFormSuccess, onSendFormError, formData);
+  };
+
   window.form = {
     disableAdForm,
     enableAdForm,
     setAddress,
+    submit,
     adForm
   };
 })();

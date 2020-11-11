@@ -6,19 +6,7 @@
 
   const mapFiltersContainer = map.querySelector(`.map__filters-container`);
 
-  const typesEnum = {
-    PALACE: `palace`,
-    FLAT: `flat`,
-    HOUSE: `house`,
-    BUNGALOW: `bungalow`,
-  };
-
-  const typesEnumRus = {
-    PALACE: `Дворец`,
-    FLAT: `Квартира`,
-    HOUSE: `Дом`,
-    BUNGALOW: `Бунгало`,
-  };
+  let activeCard = null;
 
   const hideElement = function (element) {
     element.style.display = `none`;
@@ -32,9 +20,25 @@
     return element;
   };
 
-  const renderCard = function (data) {
+  const removeActiveCard = function () {
+    if (activeCard) {
+      window.map.deactivatePin();
+      activeCard.remove();
+      activeCard = null;
+    }
+  };
+
+  const onDocumentEscKeydown = (evt) => {
+    if (window.utils.isEscPressed(evt)) {
+      removeActiveCard();
+      document.removeEventListener(`keydown`, onDocumentEscKeydown);
+    }
+  };
+
+  const renderCard = function (dataElement) {
+    removeActiveCard();
     const element = cardTemplate.cloneNode(true);
-    const dataElement = data[0];
+    activeCard = element.firstElementChild;
     const offer = dataElement.offer;
     const author = dataElement.author;
 
@@ -63,17 +67,17 @@
     const type = element.querySelector(`.popup__type`);
     if (offer.type) {
       switch (offer.type) {
-        case typesEnum.FLAT:
-          typeText = typesEnumRus.FLAT;
+        case window.enums.Types.FLAT:
+          typeText = window.enums.TypesRus.FLAT;
           break;
-        case typesEnum.BUNGALOW:
-          typeText = typesEnumRus.BUNGALOW;
+        case window.enums.Types.BUNGALOW:
+          typeText = window.enums.TypesRus.BUNGALOW;
           break;
-        case typesEnum.HOUSE:
-          typeText = typesEnumRus.HOUSE;
+        case window.enums.Types.HOUSE:
+          typeText = window.enums.TypesRus.HOUSE;
           break;
-        case typesEnum.PALACE:
-          typeText = typesEnumRus.PALACE;
+        case window.enums.Types.PALACE:
+          typeText = window.enums.TypesRus.PALACE;
           break;
       }
 
@@ -140,10 +144,28 @@
       hideElement(photosContainer);
     }
 
+    const closeButton = element.querySelector(`.popup__close`);
+    closeButton.addEventListener(`click`, removeActiveCard);
+    document.addEventListener(`keydown`, onDocumentEscKeydown);
+
     map.insertBefore(element, mapFiltersContainer);
   };
 
+  const renderCardForElement = function (element) {
+    const pinElement = element.closest(`.map__pin`);
+    if (pinElement && !pinElement.classList.contains(`map__pin--main`) && !element.classList.contains(`map__pin--active`)) {
+      const id = pinElement.dataset.id;
+      const adData = window.globalVariables.data.find((pinData) => {
+        return pinData.id === Number(id);
+      });
+      if (adData) {
+        renderCard(adData);
+        window.map.activatePin(pinElement);
+      }
+    }
+  };
+
   window.card = {
-    renderCard
+    renderCardForElement,
   };
 })();

@@ -2,5 +2,6 @@
 (function () {
   window.globalVariables = {
     isAppActive: false,
+    data: []
   };
 })();
