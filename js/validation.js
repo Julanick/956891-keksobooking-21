@@ -1,19 +1,11 @@
 "use strict";
 (function () {
-
-  const MAX_Y = 630;
-  const MIN_Y = 130;
-
-  const MAX_X = window.map.getMapWidth();
-  const MIN_X = 0;
-
   const adForm = document.querySelector(`.ad-form`);
   const guestsSelect = adForm.querySelector(`#capacity`);
   const roomsSelect = adForm.querySelector(`#room_number`);
   const titleInput = adForm.querySelector(`#title`);
   const priceInput = adForm.querySelector(`#price`);
   const typeSelect = adForm.querySelector(`#type`);
-  const addressInput = adForm.querySelector(`#address`);
   const timeinSelect = adForm.querySelector(`#timein`);
   const timeoutSelect = adForm.querySelector(`#timeout`);
 
@@ -44,38 +36,17 @@
       error = `Поле с ценой является обязательным`;
     } if (isNaN(number)) {
       error = `Значение цены должно быть числовым`;
-    } else if (number > 1000000) {
+    } else if (number > window.enums.Price.MAX_PRICE) {
       error = `Максимальная цена 1000000 руб.`;
-    } else if (typeValue === window.enums.Types.FLAT && number < 1000) {
+    } else if (typeValue === window.enums.Types.FLAT && number < window.enums.Price.FLAT) {
       error = `Минимальная цена за квартиру 1000 руб.`;
-    } else if (typeValue === window.enums.Types.HOUSE && number < 5000) {
+    } else if (typeValue === window.enums.Types.HOUSE && number < window.enums.Price.HOUSE) {
       error = `Минимальная цена за дом 5000 руб.`;
-    } else if (typeValue === window.enums.Types.PALACE && number < 10000) {
+    } else if (typeValue === window.enums.Types.PALACE && number < window.enums.Price.PALACE) {
       error = `Минимальная цена за дворец 10000 руб.`;
     }
 
     priceInput.setCustomValidity(error);
-  };
-
-  const validateAddress = function () {
-    const addressValue = addressInput.value.trim();
-
-    let error = ``;
-
-    if (!addressValue) {
-      error = `Обязательное поле`;
-    } else {
-      const coordinates = addressValue.split(`,`);
-      const x = Number.parseInt(coordinates[0], 10);
-      const y = Number.parseInt(coordinates[1], 10);
-      if (x <= MIN_X || x >= MAX_X) {
-        error = `Значение координаты Х должно быть в диапазоне `;
-      } else if (y <= MIN_Y || y >= MAX_Y) {
-        error = `Значение координаты Y должно быть в диапазоне от 130 до 630 `;
-      }
-    }
-
-    addressInput.setCustomValidity(error);
   };
 
   const updateTimein = function () {
@@ -118,15 +89,15 @@
   const updatePricePlaceholder = function () {
     const typeValue = typeSelect.value;
 
-    let placeholder = `5000`;
+    let placeholder = window.enums.Price.FLAT;
     if (typeValue === window.enums.Types.BUNGALOW) {
-      placeholder = `0`;
+      placeholder = window.enums.Price.BUNGALOW;
     } else if (typeValue === window.enums.Types.FLAT) {
-      placeholder = `1000`;
+      placeholder = window.enums.Price.FLAT;
     } else if (typeValue === window.enums.Types.HOUSE) {
-      placeholder = `5000`;
+      placeholder = window.enums.Price.HOUSE;
     } else if (typeValue === window.enums.Types.PALACE) {
-      placeholder = `10000`;
+      placeholder = window.enums.Price.PALACE;
     }
 
     priceInput.placeholder = placeholder;
@@ -147,9 +118,6 @@
       case typeSelect:
         updatePricePlaceholder();
         validateTypeAndPrice();
-        break;
-      case addressInput:
-        validateAddress();
         break;
       case timeinSelect:
         updateTimeout();

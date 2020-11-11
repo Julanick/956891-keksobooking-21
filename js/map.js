@@ -1,7 +1,7 @@
 "use strict";
 (function () {
 
-  let data = [];
+  let activePin = null;
 
   const pinTemplate = document.querySelector(`#pin`).content;
 
@@ -10,7 +10,7 @@
 
   const mapPinsContainer = map.querySelector(`.map__pins`);
 
-  const renderPins = function () {
+  const renderPins = function (data) {
     const fragment = document.createDocumentFragment();
 
     data.forEach(function (dataElement) {
@@ -30,42 +30,34 @@
     mapPinsContainer.appendChild(fragment);
   };
 
-  const setMapData = function (pinData) {
-    pinData.forEach(function (pin, index) {
-      pin.id = index;
-      data.push(pin);
-    });
-  };
-
-  const onAddsLoadSuccess = function (pinData) {
-    setMapData(pinData);
-    renderPins();
-  };
-
-  const onAddsLoadError = function (errorMessage) {
-    window.messages.showErrorMessage(errorMessage);
-  };
-
   const activate = function () {
     map.classList.remove(`map--faded`);
-    window.networkRequests.loadAds(onAddsLoadSuccess, onAddsLoadError);
   };
 
   const deactivate = function () {
     map.classList.add(`map--faded`);
   };
 
-  const getMapWidth = function () {
-    return mapPinsContainer.width;
+  const activatePin = function (pinElement) {
+    pinElement.classList.add(`map__pin--active`);
+    activePin = pinElement;
+  };
+
+  const deactivatePin = function () {
+    if (activePin) {
+      activePin.classList.remove(`map__pin--active`);
+      activePin = null;
+    }
   };
 
   window.map = {
     activate,
     deactivate,
-    data,
+    renderPins,
     mainPinMap,
     mapPinsContainer,
-    getMapWidth
+    activatePin,
+    deactivatePin
   };
 
 })();

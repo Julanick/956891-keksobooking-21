@@ -7,6 +7,13 @@
       HOUSE: `house`,
       BUNGALOW: `bungalow`,
     },
+    Price: {
+      MAX_PRICE: 1000000,
+      PALACE: 10000,
+      FLAT: 1000,
+      HOUSE: 5000,
+      BUNGALOW: 0,
+    },
     TypesRus: {
       PALACE: `Дворец`,
       FLAT: `Квартира`,

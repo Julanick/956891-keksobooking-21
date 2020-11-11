@@ -1,12 +1,24 @@
 "use strict";
-
 const activateApp = function () {
   if (!window.globalVariables.isAppActive) {
     window.form.enableAdForm();
     window.map.activate();
+    window.networkRequests.loadAds(onAddsLoadSuccess, onAddsLoadError);
     window.globalVariables.isAppActive = true;
     window.form.setAddress();
   }
+};
+
+const onAddsLoadSuccess = function (pinData) {
+  pinData.forEach(function (pin, index) {
+    pin.id = index;
+    window.globalVariables.data.push(pin);
+  });
+  window.map.renderPins(window.globalVariables.data);
+};
+
+const onAddsLoadError = function (errorMessage) {
+  window.messages.showErrorMessage(errorMessage);
 };
 
 const initApp = function () {
@@ -35,13 +47,6 @@ const initApp = function () {
   window.map.mapPinsContainer.addEventListener(`click`, (evt) => {
     evt.preventDefault();
     window.card.renderCardForElement(evt.target);
-  });
-
-  window.map.mapPinsContainer.addEventListener(`keydown`, (evt) => {
-    if (window.utils.isEnterPressed(evt)) {
-      evt.preventDefault();
-      window.card.renderCardForElement(evt.target);
-    }
   });
 };
 

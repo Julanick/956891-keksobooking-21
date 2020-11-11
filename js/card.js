@@ -22,6 +22,7 @@
 
   const removeActiveCard = function () {
     if (activeCard) {
+      window.map.deactivatePin();
       activeCard.remove();
       activeCard = null;
     }
@@ -38,7 +39,6 @@
     removeActiveCard();
     const element = cardTemplate.cloneNode(true);
     activeCard = element.firstElementChild;
-    activeCard.dataset.id = dataElement.id;
     const offer = dataElement.offer;
     const author = dataElement.author;
 
@@ -152,15 +152,15 @@
   };
 
   const renderCardForElement = function (element) {
-    const pinElement = element.closest(`button`);
-    const activePinId = activeCard ? activeCard.dataset.id : null;
-    if (pinElement.classList.contains(`map__pin`) && !pinElement.classList.contains(`map__pin--main`) && pinElement.dataset.id !== activePinId) {
+    const pinElement = element.closest(`.map__pin`);
+    if (pinElement && !pinElement.classList.contains(`map__pin--main`) && !element.classList.contains(`map__pin--active`)) {
       const id = pinElement.dataset.id;
-      const pin = window.map.data.find((pinData) => {
+      const adData = window.globalVariables.data.find((pinData) => {
         return pinData.id === Number(id);
       });
-      if (pin) {
-        renderCard(pin);
+      if (adData) {
+        renderCard(adData);
+        window.map.activatePin(pinElement);
       }
     }
   };
