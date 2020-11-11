@@ -41,6 +41,8 @@
       let top = mainPinMap.offsetTop - shift.y;
       let left = mainPinMap.offsetLeft - shift.x;
 
+      window.form.setAddress();
+
       if (top <= MIN_Y_COORDINATE) {
         top = MIN_Y_COORDINATE;
       }
@@ -70,7 +72,6 @@
           mainPinMap.removeEventListener(`click`, onClickPreventDefault);
         };
         mainPinMap.addEventListener(`click`, onClickPreventDefault);
-        window.form.setAddress();
       }
     };
 
