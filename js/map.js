@@ -2,6 +2,7 @@
 (function () {
 
   let activePin = null;
+  let pins = [];
 
   const pinTemplate = document.querySelector(`#pin`).content;
   const map = document.querySelector(`.map`);
@@ -94,11 +95,21 @@
       img.src = dataElement.author.avatar;
       img.alt = dataElement.offer.title;
 
+      pins.push(element.firstElementChild);
       fragment.appendChild(element);
     });
 
 
     mapPinsContainer.appendChild(fragment);
+  };
+
+  const removePins = function () {
+    if (pins.length) {
+      pins.forEach(function (pin) {
+        pin.remove();
+      });
+      pins = [];
+    }
   };
 
   const activate = function () {
@@ -125,6 +136,7 @@
     activate,
     deactivate,
     renderPins,
+    removePins,
     mainPinMap,
     mapPinsContainer,
     activatePin,

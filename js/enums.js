@@ -6,6 +6,7 @@
       FLAT: `flat`,
       HOUSE: `house`,
       BUNGALOW: `bungalow`,
+      ANY: `any`,
     },
     Price: {
       MAX_PRICE: 1000000,
