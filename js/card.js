@@ -167,5 +167,6 @@
 
   window.card = {
     renderCardForElement,
+    removeActiveCard
   };
 })();

@@ -10,11 +10,13 @@ const activateApp = function () {
 };
 
 const onAddsLoadSuccess = function (pinData) {
+  window.filters.activate();
   pinData.forEach(function (pin, index) {
     pin.id = index;
     window.globalVariables.data.push(pin);
   });
-  window.map.renderPins(window.globalVariables.data);
+  const filteredData = window.filters.filter(window.globalVariables.data);
+  window.map.renderPins(filteredData);
 };
 
 const onAddsLoadError = function (errorMessage) {
@@ -23,6 +25,7 @@ const onAddsLoadError = function (errorMessage) {
 
 const initApp = function () {
   window.form.disableAdForm();
+  window.filters.deactivate();
   window.form.setAddress();
 
   window.map.mainPinMap.addEventListener(`keydown`, function (evt) {
@@ -47,6 +50,14 @@ const initApp = function () {
   window.map.mapPinsContainer.addEventListener(`click`, (evt) => {
     evt.preventDefault();
     window.card.renderCardForElement(evt.target);
+  });
+
+  window.filters.adFilter.addEventListener(`change`, (evt) => {
+    evt.preventDefault();
+    window.card.removeActiveCard();
+    window.map.removePins();
+    const filteredData = window.filters.filter(window.globalVariables.data);
+    window.map.renderPins(filteredData);
   });
 };
 
