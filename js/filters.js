@@ -99,6 +99,7 @@
     adFilter.classList.add(`.map__filters--disabled`);
     desableElements(filters);
     desableElements(features);
+    adFilter.reset();
   };
 
   const activate = function () {
