@@ -15,6 +15,30 @@
       HOUSE: 5000,
       BUNGALOW: 0,
     },
+    HousingPrice: {
+      ANY: `any`,
+      MIDDLE: `middle`,
+      LOW: `low`,
+      HIGH: `high`,
+    },
+    HousingPriceRange: {
+      MIN: 0,
+      MIDDLE: 10000,
+      HIGH: 50000,
+      MAX: 1000000
+    },
+    HousingRooms: {
+      ANY: `any`,
+      ONE: `1`,
+      TWO: `2`,
+      THREE: `3`,
+    },
+    HousingGuests: {
+      ANY: `any`,
+      NOT_FOR_GUESTS: `0`,
+      ONE: `1`,
+      TWO: `2`,
+    },
     TypesRus: {
       PALACE: `Дворец`,
       FLAT: `Квартира`,
