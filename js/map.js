@@ -14,6 +14,9 @@
   const MIN_X_COORDINATE = 0 - window.enums.PinSize.WIDTH / 2;
   const MAX_X_COORDINATE = 1200 - window.enums.PinSize.WIDTH / 2;
 
+  const DEFAULT_PIN_COORDINATE_X = 570;
+  const DEFAULT_PIN_COORDINATE_Y = 375;
+
   mainPinMap.addEventListener(`mousedown`, function (evt) {
     evt.preventDefault();
 
@@ -119,6 +122,7 @@
   const deactivate = function () {
     map.classList.add(`map--faded`);
     removePins();
+    mainPinMap.setAttribute(`style`, `left: ` + DEFAULT_PIN_COORDINATE_X + `px; top: ` + DEFAULT_PIN_COORDINATE_Y + `px`);
   };
 
   const activatePin = function (pinElement) {
