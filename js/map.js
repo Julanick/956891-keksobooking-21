@@ -118,6 +118,7 @@
 
   const deactivate = function () {
     map.classList.add(`map--faded`);
+    removePins();
   };
 
   const activatePin = function (pinElement) {

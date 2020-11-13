@@ -9,6 +9,16 @@ const activateApp = function () {
   }
 };
 
+const deactivateApp = function () {
+  window.form.disableAdForm();
+  window.filters.deactivate();
+  window.map.deactivate();
+  window.card.removeActiveCard();
+  window.globalVariables.isAppActive = false;
+  window.globalVariables.data = [];
+  window.form.setAddress();
+};
+
 const onAddsLoadSuccess = function (pinData) {
   window.filters.activate();
   pinData.forEach(function (pin, index) {
@@ -23,10 +33,25 @@ const onAddsLoadError = function (errorMessage) {
   window.messages.showErrorMessage(errorMessage);
 };
 
+const onSendFormSuccess = function () {
+  window.messages.showFormSubmitSuccessMessage();
+  deactivateApp();
+};
+
+const onSendFormError = function (error) {
+  window.messages.showFormSubmitErrorMessage(error);
+};
+
+const onFilterChange = window.utils.debounce(function (evt) {
+  evt.preventDefault();
+  window.card.removeActiveCard();
+  window.map.removePins();
+  const filteredData = window.filters.filter(window.globalVariables.data);
+  window.map.renderPins(filteredData);
+});
+
 const initApp = function () {
-  window.form.disableAdForm();
-  window.filters.deactivate();
-  window.form.setAddress();
+  deactivateApp();
 
   window.map.mainPinMap.addEventListener(`keydown`, function (evt) {
     evt.preventDefault();
@@ -44,21 +69,18 @@ const initApp = function () {
 
   window.form.adForm.addEventListener(`submit`, function (evt) {
     evt.preventDefault();
-    window.form.submit();
+    const formData = new FormData(window.form.adForm);
+    window.networkRequests.uploadAd(onSendFormSuccess, onSendFormError, formData);
   });
 
-  window.map.mapPinsContainer.addEventListener(`click`, (evt) => {
+  window.form.resetButton.addEventListener(`click`, deactivateApp);
+
+  window.map.mapPinsContainer.addEventListener(`click`, function (evt) {
     evt.preventDefault();
     window.card.renderCardForElement(evt.target);
   });
 
-  window.filters.adFilter.addEventListener(`change`, (evt) => {
-    evt.preventDefault();
-    window.card.removeActiveCard();
-    window.map.removePins();
-    const filteredData = window.filters.filter(window.globalVariables.data);
-    window.map.renderPins(filteredData);
-  });
+  window.filters.adFilter.addEventListener(`change`, onFilterChange);
 };
 
 initApp();
